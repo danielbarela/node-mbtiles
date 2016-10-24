@@ -27,10 +27,12 @@
     "Andrew Pendleton <apendleton>"
   ],
   "dependencies": {
+    "async": "^2.0.1",
+    "brfs": "^1.4.3",
     "d3-queue": "~2.0.3",
-    "tiletype": "0.1.x",
+    "sphericalmercator": "~1.0.1",
     "sqlite3": "3.x",
-    "sphericalmercator": "~1.0.1"
+    "tiletype": "0.1.x"
   },
   "devDependencies": {
     "tape": "~3.0.0",

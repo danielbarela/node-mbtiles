@@ -223,4 +223,3 @@ tape('cleanup', function(assert) {
     try { fs.rmdirSync(tmp); } catch(err) { throw err; }
     assert.end();
 });
-

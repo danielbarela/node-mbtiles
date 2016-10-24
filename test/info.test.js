@@ -1,4 +1,4 @@
-require('sqlite3').verbose();
+// require('sqlite3').verbose();
 
 var fs = require('fs');
 var tape = require('tape');
@@ -94,4 +94,9 @@ tape('get/put metadata from empty file', function(assert) {
             });
         });
     });
+});
+
+tape('teardown', function(assert) {
+  try { fs.unlinkSync(fixtures.empty); } catch (err) {}
+  assert.end();
 });
