@@ -20,7 +20,9 @@ var index;
 var from;
 var to;
 
-try { fs.mkdirSync(tmp); } catch(err) { throw err; }
+if (typeof(process) !== 'undefined' && process.version) {
+  try { fs.mkdirSync(tmp); } catch(err) { throw err; }
+}
 
 tape('setup', function(assert) {
     tilesOnly  = new MBTiles(tmp + '/tilesOnly.mbtiles', assert.end);
@@ -88,7 +90,7 @@ tape('geocoderDataIterator', function(assert) {
 
             shardIds[id] = 1;
             q.defer(function(id, cb) {
-                to.putGeocoderData("term", id, crypto.randomBytes(Math.floor(Math.random()* 1024 * 1024)), cb);
+                to.putGeocoderData("term", id, [0x62, 0x75, 0x66, 0x66, 0x65, 0x72], cb);
             }, id);
 
             if (Object.keys(shardIds).length >= 50) break;
