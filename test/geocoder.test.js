@@ -220,8 +220,10 @@ tape('cleanup', function(assert) { index.close(assert.end); });
 tape('cleanup', function(assert) { from.close(assert.end); });
 tape('cleanup', function(assert) { to.close(assert.end); });
 tape('cleanup', function(assert) {
+  if (typeof(process) !== 'undefined' && process.version) {
     try { fs.unlinkSync(tmp + '/tilesOnly.mbtiles'); } catch(err) { throw err; }
     try { fs.unlinkSync(tmp + '/indexed.mbtiles'); } catch(err) { throw err; }
     try { fs.rmdirSync(tmp); } catch(err) { throw err; }
+  }
     assert.end();
 });
