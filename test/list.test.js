@@ -1,4 +1,4 @@
-require('sqlite3').verbose();
+//require('sqlite3').verbose();
 
 var fs = require('fs');
 var tape = require('tape');
@@ -7,7 +7,9 @@ var fixtures = {
     doesnotexist: __dirname + '/doesnotexist'
 };
 
-try { fs.unlinkSync(fixtures.doesnotexist); } catch (err) {}
+if (typeof(process) !== 'undefined' && process.version) {
+  try { fs.unlinkSync(fixtures.doesnotexist); } catch (err) {}
+}
 
 tape('list', function(assert) {
     MBTiles.list(fixtures.doesnotexist, function(err, list) {

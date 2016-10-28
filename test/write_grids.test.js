@@ -1,13 +1,15 @@
-require('sqlite3').verbose();
+// require('sqlite3').verbose();
 
 var fs = require('fs');
 var tape = require('tape');
 var MBTiles = require('..');
 var fixtureDir = __dirname + '/fixtures/output';
 
+if (typeof(process) !== 'undefined' && process.version) {
 // Recreate output directory to remove previous tests.
 try { fs.unlinkSync(fixtureDir + '/write_2.mbtiles'); } catch(err) {}
 try { fs.mkdirSync(fixtureDir, 0755); } catch(err) {}
+}
 
 tape('test mbtiles file creation', function(assert) {
     var completed = { written: 0, read: 0 };

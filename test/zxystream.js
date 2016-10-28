@@ -17,7 +17,6 @@ tape('zxystream default batch', function(assert) {
 
     assert.deepEqual(stream.source, source, 'sets stream.source');
     assert.deepEqual(stream.batch, 1000, 'sets stream.batch = 1000');
-
     stream.on('data', function(lines) {
         assert.equal(stream.table, 'map');
         output += lines;
