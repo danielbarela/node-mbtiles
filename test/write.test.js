@@ -80,11 +80,13 @@ tape('test mbtiles file creation', function(assert) {
                 loadTile(__dirname + '/fixtures/images/' + file, function(err, expectedTile) {
                   mbtiles.getTile(coords[3] | 0, coords[1] | 0, coords[2] | 0, function(err, tile) {
                         assert.deepEqual(tile, expectedTile);
+                        completed.read++;
                         callback(err);
                     });
                 });
             }
           }, function done() {
+            assert.equal(completed.read, 285);
             assert.end();
           });
         }
