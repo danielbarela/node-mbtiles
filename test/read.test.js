@@ -1,4 +1,4 @@
-require('sqlite3').verbose();
+//require('sqlite3').verbose();
 
 var fs = require('fs');
 var MBTiles = require('..');
@@ -25,7 +25,53 @@ function yieldsError(assert, error, msg, callback) {
 
 var loaded = {};
 
-try { fs.unlinkSync(fixtures.non_existent); } catch (err) {}
+if (typeof(process) !== 'undefined' && process.version) {
+  try { fs.unlinkSync(fixtures.non_existent); } catch (err) {}
+}
+
+function loadTile(tilePath, callback) {
+  if (typeof(process) !== 'undefined' && process.version) {
+    fs.readFile(tilePath, callback);
+  } else {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', tilePath, true);
+    xhr.responseType = 'arraybuffer';
+
+    xhr.onload = function(e) {
+      if (xhr.status !== 200) {
+        return callback();
+      }
+      return callback(null, new Buffer(this.response));
+    };
+    xhr.onerror = function(e) {
+      return callback();
+    };
+    xhr.send();
+  }
+}
+
+function loadGrid(gridPath, callback) {
+  if (typeof(process) !== 'undefined' && process.version) {
+    fs.readFile(gridPath, 'utf8', function(err, data) {
+      callback(err, JSON.parse(data));
+    });
+  } else {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', gridPath, true);
+    xhr.responseType = 'json';
+
+    xhr.onload = function(e) {
+      if (xhr.status !== 200) {
+        return callback();
+      }
+      return callback(null, this.response);
+    };
+    xhr.onerror = function(e) {
+      return callback();
+    };
+    xhr.send();
+  }
+}
 
 tape('setup', function(assert) {
     var queue = Object.keys(fixtures);
@@ -51,11 +97,14 @@ fs.readdirSync(__dirname + '/fixtures/images/').forEach(function(file) {
     tape('tile ' + coords.join('/'), function(assert) {
         loaded.plain_1.getTile(coords[0] | 0, coords[1] | 0, coords[2] | 0, function(err, tile, headers) {
             if (err) throw err;
-            assert.deepEqual(tile, fs.readFileSync(__dirname + '/fixtures/images/' + file));
-            assert.equal(headers['Content-Type'], 'image/png');
-            assert.ok(!isNaN(Date.parse(headers['Last-Modified'])));
-            assert.ok(/\d+-\d+/.test(headers['ETag']));
-            assert.end();
+            console.log('headers', headers);
+            loadTile(__dirname + '/fixtures/images/' + file, function(err, expectedTile) {
+              assert.deepEqual(tile, expectedTile);
+              assert.equal(headers['Content-Type'], 'image/png');
+              assert.ok(!isNaN(Date.parse(headers['Last-Modified'])));
+              assert.ok(/\d+-\d+/.test(headers['ETag']));
+              assert.end();
+            });
         });
     });
     tape('grid ' + coords.join('/'), function(assert) {
@@ -85,21 +134,25 @@ fs.readdirSync(__dirname + '/fixtures/grids/').forEach(function(file) {
     tape('grid ' + coords.join('/'), function(assert) {
         loaded.plain_2.getGrid(coords[0] | 0, coords[1] | 0, coords[2] | 0, function(err, grid, headers) {
             if (err) throw err;
-            assert.deepEqual(JSON.stringify(grid), fs.readFileSync(__dirname + '/fixtures/grids/' + file, 'utf8'));
-            assert.equal(headers['Content-Type'], 'text/javascript');
-            assert.ok(!isNaN(Date.parse(headers['Last-Modified'])));
-            assert.ok(/\d+-\d+/.test(headers['ETag']));
-            assert.end();
+            loadGrid(__dirname + '/fixtures/grids/' + file, function(err, expectedGrid) {
+              assert.deepEqual(grid, expectedGrid);
+              assert.equal(headers['Content-Type'], 'text/javascript');
+              assert.ok(!isNaN(Date.parse(headers['Last-Modified'])));
+              assert.ok(/\d+-\d+/.test(headers['ETag']));
+              assert.end();
+            });
         });
     });
     tape('grid alt ' + coords.join('/'), function(assert) {
         loaded.plain_4.getGrid(coords[0] | 0, coords[1] | 0, coords[2] | 0, function(err, grid, headers) {
             if (err) throw err;
-            assert.deepEqual(JSON.stringify(grid), fs.readFileSync(__dirname + '/fixtures/grids/' + file, 'utf8'));
-            assert.equal(headers['Content-Type'], 'text/javascript');
-            assert.ok(!isNaN(Date.parse(headers['Last-Modified'])));
-            assert.ok(/\d+-\d+/.test(headers['ETag']));
-            assert.end();
+            loadGrid(__dirname + '/fixtures/grids/' + file, function(err, expectedGrid) {
+              assert.deepEqual(grid, expectedGrid);
+              assert.equal(headers['Content-Type'], 'text/javascript');
+              assert.ok(!isNaN(Date.parse(headers['Last-Modified'])));
+              assert.ok(/\d+-\d+/.test(headers['ETag']));
+              assert.end();
+            });
         });
     });
 });
