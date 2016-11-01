@@ -97,7 +97,6 @@ fs.readdirSync(__dirname + '/fixtures/images/').forEach(function(file) {
     tape('tile ' + coords.join('/'), function(assert) {
         loaded.plain_1.getTile(coords[0] | 0, coords[1] | 0, coords[2] | 0, function(err, tile, headers) {
             if (err) throw err;
-            console.log('headers', headers);
             loadTile(__dirname + '/fixtures/images/' + file, function(err, expectedTile) {
               assert.deepEqual(tile, expectedTile);
               assert.equal(headers['Content-Type'], 'image/png');
