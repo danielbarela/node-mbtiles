@@ -9,6 +9,7 @@ var fixtures = {
     plain_2: __dirname + '/fixtures/plain_2.mbtiles',
     plain_3: __dirname + '/fixtures/plain_3.mbtiles',
     plain_4: __dirname + '/fixtures/plain_4.mbtiles',
+    buffer_1: fs.readFileSync(__dirname + '/fixtures/plain_1.mbtiles'),
     non_existent: __dirname + '/fixtures/non_existent.mbtiles',
     corrupt: __dirname + '/fixtures/corrupt.mbtiles',
     corrupt_null_tile: __dirname + '/fixtures/corrupt_null_tile.mbtiles'
@@ -96,6 +97,18 @@ fs.readdirSync(__dirname + '/fixtures/images/').forEach(function(file) {
     coords[2] = Math.pow(2, coords[0]) - 1 - coords[2];
     tape('tile ' + coords.join('/'), function(assert) {
         loaded.plain_1.getTile(coords[0] | 0, coords[1] | 0, coords[2] | 0, function(err, tile, headers) {
+            if (err) throw err;
+            loadTile(__dirname + '/fixtures/images/' + file, function(err, expectedTile) {
+              assert.deepEqual(tile, expectedTile);
+              assert.equal(headers['Content-Type'], 'image/png');
+              assert.ok(!isNaN(Date.parse(headers['Last-Modified'])));
+              assert.ok(/\d+-\d+/.test(headers['ETag']));
+              assert.end();
+            });
+        });
+    });
+    tape('buffer tile ' + coords.join('/'), function(assert) {
+        loaded.buffer_1.getTile(coords[0] | 0, coords[1] | 0, coords[2] | 0, function(err, tile, headers) {
             if (err) throw err;
             loadTile(__dirname + '/fixtures/images/' + file, function(err, expectedTile) {
               assert.deepEqual(tile, expectedTile);
