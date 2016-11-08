@@ -42,6 +42,9 @@
   "engines": {
     "node": ">= 0.10.0"
   },
+  "browserify": {
+    "transform": ["brfs"]
+  },
   "scripts": {
     "test": "eslint lib && tape test/*.js"
   }
